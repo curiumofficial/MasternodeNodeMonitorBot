@@ -1,5 +1,5 @@
 ##
-# Part of `SmartNodeMonitorBot`
+# Part of `MasterNodeMonitorBot`
 #
 # Copyright 2018 dustinface
 #
@@ -34,7 +34,7 @@ import threading
 import re
 import uuid
 
-logger = logging.getLogger("smartexplorer")
+logger = logging.getLogger("curiumexplorer")
 
 lockForever = sys.float_info.max
 
@@ -67,15 +67,15 @@ class Request(object):
 
         self.cb(self.future)
 
-class SmartExplorer(object):
+class CuriumExplorer(object):
 
     def __init__(self, balancesCB):
         self.balancesCB = balancesCB
 
     def balances(self, addresses):
-        logger.warning("SmartExplorer balances")
+        logger.warning("CuriumExplorer balances")
 
-class LocalExplorer(SmartExplorer):
+class LocalExplorer(CuriumExplorer):
 
     def __init__(self,balancesCB):
         super().__init__(balancesCB)
@@ -83,15 +83,13 @@ class LocalExplorer(SmartExplorer):
     def balances(self,addresses):
         logger.warning("LocalExplorer maybe later...")
 
-class WebExplorer(SmartExplorer):
+class WebExplorer(CuriumExplorer):
 
     def __init__(self,balancesCB):
         super().__init__(balancesCB)
 
         self.lastUrl = 0
-        self.urls = {'https://explorer.smartcash.cc': None,\
-                     'https://explorer2.smartcash.cc': lockForever,\
-                     'https://explorer3.smartcash.cc': None}
+        self.urls = {'https://explorer.curiumofficial.com': None}
 
         self.urlLockSeconds = 3600
         self.session = FuturesSession(max_workers=20)

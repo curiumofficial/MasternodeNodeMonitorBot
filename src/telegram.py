@@ -1,5 +1,5 @@
 ##
-# Part of `SmartNodeMonitorBot`
+# Part of `MasterNodeMonitorBot`
 #
 # Copyright 2018 dustinface
 #
@@ -41,9 +41,9 @@ from src import faq as questions
 from src.commandhandler import node
 from src.commandhandler import user
 from src.commandhandler import common
-from src.smartexplorer import WebExplorer
+from src.curiumexplorer import WebExplorer
 
-from smartcash.rewardlist import SNReward
+from curium.rewardlist import MNReward
 
 logger = logging.getLogger("bot")
 
@@ -299,7 +299,7 @@ class MessagingMachine(object):
         self.startTimer()
 
 
-class SmartNodeBotTelegram(object):
+class MasterNodeBotTelegram(object):
 
     def __init__(self, botToken, admins, password, db, nodeList, rewardList):
 
@@ -390,7 +390,7 @@ class SmartNodeBotTelegram(object):
 
                 if not reward:
 
-                    reward = SNReward(block=node.lastPaidBlock,
+                    reward = MNReward(block=node.lastPaidBlock,
                                       payee = node.payee,
                                       txtime=node.lastPaidTime,
                                       source=1)
@@ -402,7 +402,7 @@ class SmartNodeBotTelegram(object):
                 if reward.source == 1:
                     continue
 
-                reward = SNReward(block=node.lastPaidBlock,
+                reward = MNReward(block=node.lastPaidBlock,
                                   payee = node.payee,
                                   txtime=node.lastPaidTime,
                                   source=1)
@@ -687,22 +687,22 @@ class SmartNodeBotTelegram(object):
 
 
     ######
-    # Callback which get called when there is a new releases in the smartcash repo.
+    # Callback which get called when there is a new releases in the curium repo.
     #
-    # Called by: Nothing yet, SmartGitHubUpdates later.
+    # Called by: Nothing yet, MasterGitHubUpdates later.
     #
     ######
     def updateCheckCallback(self, tag):
 
         for dbUser in self.database.getUsers():
             self.sendMessage(dbUser['id'], ("*Node update available*\n\n"
-                                         "https://github.com/SmartCash/smartcash/releases/tag/{}").format(tag))
+                                         "https://github.com/Curium/curium/releases/tag/{}").format(tag))
 
     ######
     # Callback for evaluating if someone in the database had an upcomming event
     # and send messages to all chats with activated notifications
     #
-    # Called by: SmartNodeList
+    # Called by: MasterNodeList
     #
     ######
     def nodeUpdateCB(self, update, n):
@@ -717,7 +717,7 @@ class SmartNodeBotTelegram(object):
     # Callback for evaluating if someone in the database has won the reward
     # and send messages to all chats with activated notifications
     #
-    # Called by: SNRewardList from python-smartcash
+    # Called by: MNRewardList from python-curium
     #
     ######
     def rewardCB(self, reward, synced):
@@ -733,7 +733,7 @@ class SmartNodeBotTelegram(object):
     # Callback for evaluating if someone in the database has won the reward
     # and send messages to all chats with activated notifications
     #
-    # Called by: SNRewardList from python-smartcash
+    # Called by: MNRewardList from python-curium
     #
     ######
     def rewardCB(self, reward, distance):
@@ -752,9 +752,9 @@ class SmartNodeBotTelegram(object):
             self.aberration = 1 - ( nList / total)
 
     ######
-    # Callback for SNRewardList errors
+    # Callback for MNRewardList errors
     #
-    # Called by: SNRewardList from python-smartcash
+    # Called by: MNRewardList from python-curium
     #
     ######
     def rewardListErrorCB(self, error):
@@ -792,10 +792,10 @@ class SmartNodeBotTelegram(object):
 
 
     ######
-    # Callback which gets called from the SmartNodeList when a balance request triggered by any user
+    # Callback which gets called from the MasterNodeList when a balance request triggered by any user
     # is done. It sends the result to the related user.
     #
-    # Called by: SmartExplorer
+    # Called by: CuriumExplorer
     #
     ######
     def balancesCB(self, check, results):
@@ -819,7 +819,7 @@ class SmartNodeBotTelegram(object):
     ######
     # Push the message to the admin
     #
-    # Called by: SmartNodeList
+    # Called by: MasterNodeList
     #
     ######
     def adminCB(self, message):

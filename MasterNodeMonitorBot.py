@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# Part of `SmartNodeMonitorBot`
+# Part of `MasterNodeMonitorBot`
 #
 # Copyright 2018 dustinface
 #
@@ -32,10 +32,10 @@ from src import database
 from src import telegram
 from src import discord
 
-from src.smartnodes import SmartNodeList
+from src.masternodes import MasterNodeList
 
-from smartcash.rpc import RPCConfig
-from smartcash.rewardlist import SNRewardList
+from mastercash.rpc import RPCConfig
+from mastercash.rewardlist import MNRewardList
 
 __version__ = "2.0"
 
@@ -53,7 +53,7 @@ def main(argv):
     config = configparser.SafeConfigParser()
 
     try:
-        config.read(directory + '/smart.conf')
+        config.read(directory + '/master.conf')
     except:
         sys.exit("Config file missing or corrupt.")
 
@@ -106,7 +106,7 @@ def main(argv):
     # Load the user database
     botdb = database.BotDatabase(directory + '/bot.db')
 
-    # Load the smartnodes database
+    # Load the masternodes database
     nodedb = database.NodeDatabase(directory + '/nodes.db')
 
     admins = []
@@ -125,18 +125,18 @@ def main(argv):
     githubUser = config.get('general','githubuser')
     githubPassword = config.get('general','githubpassword')
 
-    # Create the smartnode list
-    nodeList = SmartNodeList(nodedb, rpcConfig)
+    # Create the masternode list
+    nodeList = MasterNodeList(nodedb, rpcConfig)
 
-    # Create the smartnode reward list
-    rewardList = SNRewardList(directory + '/rewards.db', rpcConfig)
+    # Create the masternode reward list
+    rewardList = MNRewardList(directory + '/rewards.db', rpcConfig)
 
     nodeBot = None
 
     if config.get('bot', 'app') == 'telegram':
-        nodeBot = telegram.SmartNodeBotTelegram(config.get('bot','token'), admins, password, botdb, nodeList, rewardList)
+        nodeBot = telegram.MasterNodeBotTelegram(config.get('bot','token'), admins, password, botdb, nodeList, rewardList)
     elif config.get('bot', 'app') == 'discord':
-        nodeBot = discord.SmartNodeBotDiscord(config.get('bot','token'), admins, password, botdb, nodeList, rewardList)
+        nodeBot = discord.MasterNodeBotDiscord(config.get('bot','token'), admins, password, botdb, nodeList, rewardList)
     else:
         sys.exit("You need to set 'telegram' or 'discord' as 'app' in the configfile.")
 

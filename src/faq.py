@@ -1,5 +1,5 @@
 ##
-# Part of `SmartNodeMonitorBot`
+# Part of `MasterNodeMonitorBot`
 #
 # Copyright 2018 dustinface
 #
@@ -86,7 +86,7 @@ def position(bot):
         top10Time = util.secondsToText(top10Seconds)
 
         return (
-        "We have currenty <b>{}<b> qualified SmartNodes. All those are in a "
+        "We have currenty <b>{}<b> qualified MasterNodes. All those are in a "
         "virtual payout queue. Each mined block (55seconds) one "
         "of the nodes in the top 10% of that queue gets picked perchance and"
         " receives a payout. After that it moves back to the end of the queue.\n\n"
@@ -100,7 +100,7 @@ def position(bot):
         "bit in the queue from time to time. This happens each time a node that"
         " has received its last payment longer ago as yours becomes eligible"
         " for payouts (it jumpes into the queue and receives a position)."
-        " At this moment we have <b>{}<b> SmartNodes. <b>{}<b> of them are"
+        " At this moment we have <b>{}<b> MasterNodes. <b>{}<b> of them are"
         " <b>not<b> qualified for payouts. Each time one of the unqualified"
         " nodes becomes eligible due to a full match of the requirements"
         " it is very likely that it will jump ahead of yours.\n\n"
@@ -121,7 +121,7 @@ def collateral(bot):
 
         return (
         "A too new collateral means that your nodes collateral transaction (the 10k one) does not"
-        " have the minimum required number of confirmations in the SmartCash blockchain."
+        " have the minimum required number of confirmations in the Curium blockchain."
         "This number of confirmations is currently <b>{}<b>.\nYour collateral gets 1 confirmation with each"
         " new mined block.\n\nMeans right now you need to wait {} x 55 seconds => <b>~{}<b> until"
         " your collateral transaction matches the requirement.\n\n"
@@ -177,19 +177,19 @@ def rewards(bot):
         perMonth = round((30.5 / payoutDays) * currentReward,1)
 
         return (
-        "The SmartNode rewards are calculated by the following formula\n\n"
+        "The MasterNode rewards are calculated by the following formula\n\n"
         "```reward = 5000 x 143500 / blockHeight * 0.1```\n\n"
         "At this moment our blockchain is at the height <b>{}<b> that means"
-        "\n\n```5000 x 143500 / {} * 0.1 => {} SMART per block```\n\n"
+        "\n\n```5000 x 143500 / {} * 0.1 => {} CRU per block```\n\n"
         "Each block one of the the nodes receives this reward. With the current "
         "estimated payout interval of <b>{}<b> you can expect roughly"
-        " <b>{:,} SMART<b> per month per SmartNode. This can vary a bit upwards and downwards though.\n\n"
-        "Due to the constant increase of the <c>blockHeight<c> of the SmartCash blockchain"
+        " <b>{:,} CRU<b> per month per MasterNode. This can vary a bit upwards and downwards though.\n\n"
+        "Due to the constant increase of the <c>blockHeight<c> of the Curium blockchain"
         " the rewards will decrease a little bit every 55 seconds."
         " Also the increase of the number of qualified nodes will increase the payout interval."
         " As result your monthly payout will slightly decrease over the time.\n\n"
         "You can look at the chart in the link below to see the reward decrease "
-        "for the first 4 years after the SmartNode launch.\n\n"
+        "for the first 4 years after the MasterNode launch.\n\n"
         ).format(lastBlock, lastBlock, currentReward, interval, perMonth)\
         + messages.link(bot.messenger, "https://goo.gl/Va817H", "Click here to open the chart")
 
@@ -197,26 +197,26 @@ def status(bot):
 
     return (
     "First you should check your node's status by running "
-    "<c>smartcash-cli smartnode status<c> on your node's VPS.\n\n"
+    "<c>curium-cli masternode status<c> on your node's VPS.\n\n"
     "The status of your node can hint towards the problem of why your "
     "node isn't running. Here are the known states and their likely causes:\n\n"
     "<b>Node just started, not yet activated<b>\n\n"
     "Simply means your blocks aren't up-to-date yet with the current "
-    "blockcount. Run <c>smartcash-cli getinfo<c> on the VPS to see your current "
+    "blockcount. Run <c>curium-cli getinfo<c> on the VPS to see your current "
     "blockHeight at <c>blocks<c>, and compare it to the current blockHeight that "
     "you can see when you send me <cb>info<ca>\n\n"
     "<b>Broadcast IP doesn't match external IP<b>\n\n"
     "Most likely culprit is a duplicate IP/genkey/txhash in the "
-    "config file. Verify that all node entries in the <c>smartnode.conf<c> file "
+    "config file. Verify that all node entries in the <c>masternode.conf<c> file "
     " have a unique IP/genkey/txhash+id. If your VPS has multiple IP's, adding "
-    "externalip=yourNodeIP in the <c>smartcash.conf<c> of a daemon will direct it"
+    "externalip=yourNodeIP in the <c>curium.conf<c> of a daemon will direct it"
     " towards the IP you specified.\n\n"
-    "<b>Not capable smartnode: invalid protocol version<b>\n\n"
+    "<b>Not capable masternode: invalid protocol version<b>\n\n"
     "Your node is not up-to-date on the latest version. Compare the version you"
-    " see when you run <c>smartcash-cli getinfo<c> at <c>version<c> to the latest version at ") +\
-    messages.link(bot.messenger, "https://smartcash.cc/wallets/", "SmartCash wallets") +\
+    " see when you run <c>curium-cli getinfo<c> at <c>version<c> to the latest version at ") +\
+    messages.link(bot.messenger, "https://curium.cc/wallets/", "Curium wallets") +\
     (" for more info on the current version.\n\n"
-    "<b>Not capable smartnode: smartnode not in smartnodelist<b>\n\n"
+    "<b>Not capable masternode: masternode not in masternodelist<b>\n\n"
     "The node hasn't yet connected to the network. This can have "
     "several reasons; your desktop-wallet is outdated, your node is "
     "outdated or you didn't yet issue a <c>Start alias<c> command while the "
@@ -233,7 +233,7 @@ faqs = {
              initial ),
     'rewards' : FAQ("What payouts can i expect from my nodes?",
              rewards ),
-    'status' : FAQ(("What should be done when a SmartNode is <b>not<b> successfully started?"),
+    'status' : FAQ(("What should be done when a MasterNode is <b>not<b> successfully started?"),
              status )
 }
 

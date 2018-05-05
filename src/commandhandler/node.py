@@ -1,5 +1,5 @@
 ##
-# Part of `SmartNodeMonitorBot`
+# Part of `MasterNodeMonitorBot`
 #
 # Copyright 2018 dustinface
 #
@@ -30,7 +30,7 @@ from src import messages
 import telegram
 import discord
 
-from smartcash.rewardlist import SNReward
+from curium.rewardlist import MNReward
 
 logger = logging.getLogger("node")
 
@@ -306,19 +306,19 @@ def detail(bot, update):
 
             for userNode in userNodes:
 
-                smartnode = nodeList.getNodes([userNode['collateral']])[0]
+                masternode = nodeList.getNodes([userNode['collateral']])[0]
 
-                response += messages.markdown(("<b>" + userNode['name'] + " - " + smartnode.ip + "<b>")  ,bot.messenger)
-                response += "\n  `Status` " + smartnode.status
-                response += "\n  `Position` " + messages.markdown(smartnode.positionString(minimumUptime, top10),bot.messenger)
-                response += "\n  `Payee` " + smartnode.payee
-                response += "\n  `Active since` " + util.secondsToText(smartnode.activeSeconds)
-                response += "\n  `Last seen` " + util.secondsToText( int(time.time()) - smartnode.lastSeen)
-                response += "\n  `Last payout (Block)` " + smartnode.payoutBlockString()
-                response += "\n  `Last payout (Time)` " + smartnode.payoutTimeString()
-                response += "\n  `Protocol` {}".format(smartnode.protocol)
-                #response += "\n  `Rank` {}".format(smartnode.rank)
-                response += "\n  " + messages.link(bot.messenger, 'https://explorer3.smartcash.cc/address/{}'.format(smartnode.payee),'Open the explorer!')
+                response += messages.markdown(("<b>" + userNode['name'] + " - " + masternode.ip + "<b>")  ,bot.messenger)
+                response += "\n  `Status` " + masternode.status
+                response += "\n  `Position` " + messages.markdown(masternode.positionString(minimumUptime, top10),bot.messenger)
+                response += "\n  `Payee` " + masternode.payee
+                response += "\n  `Active since` " + util.secondsToText(masternode.activeSeconds)
+                response += "\n  `Last seen` " + util.secondsToText( int(time.time()) - masternode.lastSeen)
+                response += "\n  `Last payout (Block)` " + masternode.payoutBlockString()
+                response += "\n  `Last payout (Time)` " + masternode.payoutTimeString()
+                response += "\n  `Protocol` {}".format(masternode.protocol)
+                #response += "\n  `Rank` {}".format(masternode.rank)
+                response += "\n  " + messages.link(bot.messenger, 'https://explorer3.curium.cc/address/{}'.format(masternode.payee),'Open the explorer!')
                 response += "\n\n"
 
     return response
@@ -360,16 +360,16 @@ def nodes(bot, update):
             minimumUptime = nodeList.minimumUptime()
             top10 = nodeList.enabledWithMinProtocol() * 0.1
 
-            for smartnode in sorted(nodes, key=lambda x: x.position if x.position > 0 else 100000):
+            for masternode in sorted(nodes, key=lambda x: x.position if x.position > 0 else 100000):
 
-                userNode = bot.database.getNodes(smartnode.collateral, user['id'])
+                userNode = bot.database.getNodes(masternode.collateral, user['id'])
 
-                payoutText = util.secondsToText(smartnode.lastPaidTime)
-                response += messages.markdown("<b>" + userNode['name'] + "<b> - `" + smartnode.status + "`",bot.messenger)
-                response += "\nPosition " + messages.markdown(smartnode.positionString(minimumUptime, top10),bot.messenger)
-                response += "\nLast seen " + util.secondsToText( int(time.time()) - smartnode.lastSeen)
-                response += "\nLast payout " + smartnode.payoutTimeString()
-                response += "\n" + messages.link(bot.messenger, 'https://explorer3.smartcash.cc/address/{}'.format(smartnode.payee),'Open the explorer!')
+                payoutText = util.secondsToText(masternode.lastPaidTime)
+                response += messages.markdown("<b>" + userNode['name'] + "<b> - `" + masternode.status + "`",bot.messenger)
+                response += "\nPosition " + messages.markdown(masternode.positionString(minimumUptime, top10),bot.messenger)
+                response += "\nLast seen " + util.secondsToText( int(time.time()) - masternode.lastSeen)
+                response += "\nLast payout " + masternode.payoutTimeString()
+                response += "\n" + messages.link(bot.messenger, 'https://explorer3.curium.cc/address/{}'.format(masternode.payee),'Open the explorer!')
                 response += "\n\n"
 
     return response
@@ -416,10 +416,10 @@ def history(bot, update):
             countMultiplePayouts = 0
             totalProfit30Days = 0
 
-            for smartnode in nodes:
+            for masternode in nodes:
 
-                userNode = bot.database.getNodes(smartnode.collateral, user['id'])
-                rewards = bot.rewardList.getRewardsForPayee(smartnode.payee)
+                userNode = bot.database.getNodes(masternode.collateral, user['id'])
+                rewards = bot.rewardList.getRewardsForPayee(masternode.payee)
 
                 profit = sum(map(lambda x: x.amount,rewards))
                 profit30Days = sum(map(lambda x: x.amount if x.txtime > time30Days else 0,rewards))
@@ -427,7 +427,7 @@ def history(bot, update):
 
                 totalProfit += round(profit,1)
                 avgInterval = 0
-                smartPerDay = 0
+                masterPerDay = 0
 
                 first = 0
                 last = 0
@@ -452,20 +452,20 @@ def history(bot, update):
                     avgInterval = (last - first) / len(rewards)
                     totalAvgInterval += avgInterval
 
-                    smartPerDay = round( profit / ( (time.time() - first) / 86400 ),1)
+                    masterPerDay = round( profit / ( (time.time() - first) / 86400 ),1)
 
                 response += "<u><b>Node - " + userNode['name'] + "<b><u>\n\n"
                 response += "<b>Payouts<b> {}\n".format(len(rewards))
-                response += "<b>Profit<b> {:,} SMART\n".format(round(profit,1))
-                response += "<b>Profit (30 days)<b> {:,} SMART\n".format(round(profit30Days,1))
+                response += "<b>Profit<b> {:,} CRU\n".format(round(profit,1))
+                response += "<b>Profit (30 days)<b> {:,} CRU\n".format(round(profit30Days,1))
 
                 if avgInterval:
                     response += "\n<b>Payout interval<b> " + util.secondsToText(avgInterval)
 
-                if smartPerDay:
-                    response += "\n<b>SMART/day<b> {:,} SMART".format(smartPerDay)
+                if masterPerDay:
+                    response += "\n<b>CRU/day<b> {:,} CRU".format(masterPerDay)
 
-                response += "\n<b>ROI (SMART)<b> {}%".format(round((profit/10000.0)*100.0,1))
+                response += "\n<b>ROI (CRU)<b> {}%".format(round((profit/10000.0)*100.0,1))
 
                 response += "\n\n"
 
@@ -474,16 +474,16 @@ def history(bot, update):
             if totalFirst:
                 response += "<b>First payout<b> {} ago\n\n".format(util.secondsToText( time.time() - totalFirst ) )
 
-            response += "<b>Profit (30 days)<b> {:,} SMART\n".format(round(totalProfit30Days,1))
-            response += "<b>SMART/day (30 days)<b> {:,} SMART\n\n".format(round(totalProfit30Days/30,1))
+            response += "<b>Profit (30 days)<b> {:,} CRU\n".format(round(totalProfit30Days,1))
+            response += "<b>CRU/day (30 days)<b> {:,} CRU\n\n".format(round(totalProfit30Days/30,1))
 
             if totalAvgInterval:
                 totalAvgInterval = totalAvgInterval/countMultiplePayouts
                 response += "<b>Total payout interval<b> {}\n".format(util.secondsToText(totalAvgInterval))
 
-            response += "<b>Total SMART/day<b> {:,} SMART\n\n".format(round(totalProfit/( ( time.time() - totalFirst ) / 86400),1))
-            response += "<b>Total profit<b> {:,} SMART\n".format(round(totalProfit,1))
-            response += "<b>Total ROI (SMART)<b> {}%\n\n".format(round((totalProfit / totalInvest)*100,1))
+            response += "<b>Total CRU/day<b> {:,} CRU\n\n".format(round(totalProfit/( ( time.time() - totalFirst ) / 86400),1))
+            response += "<b>Total profit<b> {:,} CRU\n".format(round(totalProfit,1))
+            response += "<b>Total ROI (CRU)<b> {}%\n\n".format(round((totalProfit / totalInvest)*100,1))
 
     return messages.markdown(response, bot.messenger)
 
@@ -539,13 +539,13 @@ def top(bot, update, args):
             minimumUptime = nodeList.minimumUptime()
 
             if len(topNodes):
-                for smartnode in sorted(topNodes, key=lambda x: x.position if x.position > 0 else 100000):
+                for masternode in sorted(topNodes, key=lambda x: x.position if x.position > 0 else 100000):
 
-                    userNode = bot.database.getNodes(smartnode.collateral, user['id'])
+                    userNode = bot.database.getNodes(masternode.collateral, user['id'])
 
                     response += "<b>" + userNode['name'] + "<b>"
-                    response += "\nPosition " + messages.markdown(smartnode.positionString(minimumUptime),bot.messenger)
-                    response += "\n" + messages.link(bot.messenger, 'https://explorer3.smartcash.cc/address/{}'.format(smartnode.payee),'Open the explorer!')
+                    response += "\nPosition " + messages.markdown(masternode.positionString(minimumUptime),bot.messenger)
+                    response += "\n" + messages.link(bot.messenger, 'https://explorer3.curium.cc/address/{}'.format(masternode.payee),'Open the explorer!')
                     response += "\n\n"
             else:
                 response += "<b>You have currently no nodes in the top {}% of the queue.<b>\n\n".format(topPercent)
@@ -582,12 +582,12 @@ def balances(bot, userId, results):
 
                         try:
                             total += round(result.data,1)
-                            response += "{} - {:,} SMART\n".format(node['name'], result.data)
+                            response += "{} - {:,} CRU\n".format(node['name'], result.data)
                         except:
                             logger.warning("Balance response invalid: {}".format(result.data))
                             response += "{} - Error: Could not fetch this balance.\n".format(node['name'])
 
-        response += messages.markdown("\nTotal: <b>{:,} SMART<b>".format(round(total,1)),bot.messenger)
+        response += messages.markdown("\nTotal: <b>{:,} CRU<b>".format(round(total,1)),bot.messenger)
 
     else:
         response += "Sorry, could not check your balances! Looks like all explorers are down. Try it again later.\n\n"
@@ -651,7 +651,7 @@ def handleNodeUpdate(bot, update, node):
         # Update the source of the reward in the rewardlist to be able to track the
         # number of missing blocks in the nodelist
         # If the reward was not available yet it gets added
-        reward = SNReward(block=node.lastPaidBlock,
+        reward = MNReward(block=node.lastPaidBlock,
                           txtime=node.lastPaidTime,
                           payee=node.payee,
                           source=1,
@@ -661,7 +661,7 @@ def handleNodeUpdate(bot, update, node):
 
         if not dbReward:
 
-            reward = SNReward(block=node.lastPaidBlock,
+            reward = MNReward(block=node.lastPaidBlock,
                               payee = node.payee,
                               txtime=node.lastPaidTime,
                               source=1)
